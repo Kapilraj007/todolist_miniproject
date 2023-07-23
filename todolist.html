@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .completed {
+            text-decoration: line-through;
+        }
+        
+        .alert-message {
+            animation: alert 1s ease-out;
+        }
+        
+        @keyframes alert {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .empty-list-icon {
+            font-size: 5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white rounded-md shadow-md">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold text-gray-800">Todo List</h1>
+                <div class="mt-4">
+                    <input id="new-task-input" type="text" class="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add a task..." />
+                </div>
+                <button id="add-task-btn" class="mt-4 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:bg-indigo-700">
+                    Add Task
+                </button>
+                <ul id="task-list" class="mt-4 space-y-2">
+                   
+                </ul>
+                <div id="empty-list-message" class="flex items-center justify-center h-40">
+                    <svg style="height: 80px;" class="empty-list-icon text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V9a1 1 0 00-1-1h-9l-2-2zm0 0v6h6V4h-6zm9 14H5v-7h14v7zm-4-3h-4v2h4v-2z" />
+                    </svg>
+                    <p class="text-gray-500">The task list is empty.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('task-list');
+        const newTaskInput = document.getElementById('new-task-input');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const emptyListMessage = document.getElementById('empty-list-message');
+
+        
+        function createTaskElement(taskText) {
+            const li = document.createElement('li');
+            li.classList.add('flex', 'items-center');
+
+            const taskElement = document.createElement('div');
+            taskElement.classList.add('flex', 'items-center', 'w-full');
+            li.appendChild(taskElement);
+
+            const markCompleteButton = document.createElement('button');
+            markCompleteButton.classList.add('mark-complete-btn', 'text-green-600', 'mr-2');
+            markCompleteButton.innerText = 'Mark as Complete';
+            taskElement.appendChild(markCompleteButton);
+
+            const taskTextElement = document.createElement('span');
+            taskTextElement.classList.add('ml-2', 'text-gray-800');
+            taskTextElement.innerText = taskText;
+            taskElement.appendChild(taskTextElement);
+
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('ml-auto', 'flex', 'space-x-2');
+            taskElement.appendChild(buttonsContainer);
+
+            const editButton = document.createElement('button');
+            editButton.classList.add('edit-btn', 'text-indigo-600');
+            editButton.innerText = 'Edit';
+            buttonsContainer.appendChild(editButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-btn', 'text-red-600');
+            deleteButton.innerText = 'Delete';
+            buttonsContainer.appendChild(deleteButton);
+
+            return li;
+        }
+
+        function addTask() {
+            const taskText = newTaskInput.value;
+            if (taskText.trim() !== '') {
+                const taskElement = createTaskElement(taskText);
+                taskList.appendChild(taskElement);
+                newTaskInput.value = '';
+                showSuccessMessage('Task added successfully!');
+                emptyListMessage.style.display = 'none';
+            } else {
+                showErrorMessage('Please enter a task.');
+            }
+        }
+        function deleteTask(taskElement) {
+            taskElement.remove();
+            showSuccessMessage('Task deleted successfully!');
+            if (taskList.children.length === 0) {
+                emptyListMessage.style.display = 'flex';
+            }
+        }
+
+            function markAsCompleted(taskElement, completed) {
+            if (completed) {
+                taskElement.classList.add('completed');
+                showSuccessMessage('Task marked as completed!');
+            } else {
+                taskElement.classList.remove('completed');
+                showSuccessMessage('Task marked as incomplete!');
+            }
+        }
+
+             function handleTaskActions(event) {
+            const target = event.target;
+            const taskElement = target.closest('li');
+
+            if (target.classList.contains('delete-btn')) {
+                deleteTask(taskElement);
+            } else if (target.classList.contains('edit-btn')) {
+                const taskTextElement = taskElement.querySelector('span');
+                const taskText = taskTextElement.innerText;
+                const newTaskText = prompt('Edit Task', taskText);
+                if (newTaskText !== null && newTaskText.trim() !== '') {
+                    taskTextElement.innerText = newTaskText;
+                    showSuccessMessage('Task edited successfully!');
+                } else {
+                    showErrorMessage('Invalid task name.');
+                }
+            } else if (target.classList.contains('mark-complete-btn')) {
+                const completeButton = taskElement.querySelector('.mark-complete-btn');
+                const completed = !taskElement.classList.contains('completed');
+                markAsCompleted(taskElement, completed);
+                completeButton.innerText = completed ? 'Mark as Incomplete' : 'Mark as Complete';
+            }
+        }
+
+             function showSuccessMessage(message) {
+            
+        }
+
+                function showErrorMessage(message) {
+          
+        }
+
+        addTaskBtn.addEventListener('click', addTask);
+        taskList.addEventListener('click', handleTaskActions);
+    </script>
+</body>
+
+</html>
